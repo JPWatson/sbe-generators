@@ -264,12 +264,12 @@ public class CSharpGenerator implements CodeGenerator {
     }
 
     private static CharSequence generateCompositeFlyweightCode(
-            final String className, final int size, final String bufferImplementation) {
+            final String className, final int size, final String bufferImplementation, final String compositeReturnType) {
         return String.format(
                 "    public static int ENCODED_LENGTH = %2$d;\n" +
                         "    private int _offset;\n" +
                         "    private %3$s _buffer;\n\n" +
-                        "    public %1$s Wrap(%3$s buffer, int offset)\n" +
+                        "    public %4$s Wrap(%3$s buffer, int offset)\n" +
                         "    {\n" +
                         "        this._buffer = buffer;\n" +
                         "        this._offset = offset;\n\n" +
@@ -289,7 +289,8 @@ public class CSharpGenerator implements CodeGenerator {
                         "    }\n",
                 className,
                 size,
-                bufferImplementation);
+                bufferImplementation,
+                compositeReturnType);
     }
 
     private static void generateFieldIdMethod(final StringBuilder sb, final Token token, final String indent) {
@@ -1229,10 +1230,11 @@ public class CSharpGenerator implements CodeGenerator {
             final Writer out,
             final String buffer,
             final String fqBuffer,
-            final String implementsString) throws IOException {
+            final String implementsString,
+            final String compositeReturnType) throws IOException {
         out.append(generateFileHeader(namespace(), fqBuffer));
         out.append(generateDeclaration(typeName, implementsString));
-        out.append(generateCompositeFlyweightCode(typeName, token.encodedLength(), buffer));
+        out.append(generateCompositeFlyweightCode(typeName, token.encodedLength(), buffer, compositeReturnType));
     }
 
     private void generateEnum(final List<Token> tokens) throws IOException {
@@ -1259,7 +1261,7 @@ public class CSharpGenerator implements CodeGenerator {
         try (Writer out = outputManager.createOutput(decoderName)) {
             final String implementsString = implementsInterface(GEN_COMPOSITE_DECODER_FLYWEIGHT);
             generateCompositeFlyweightHeader(
-                    token, decoderName, out, readOnlyBuffer, fqReadOnlyBuffer, implementsString);
+                    token, decoderName, out, readOnlyBuffer, fqReadOnlyBuffer, implementsString, "ICompositeDecoderFlyweight");
 
             for (int i = 1, end = tokens.size() - 1; i < end; ) {
                 final Token encodingToken = tokens.get(i);
@@ -1303,7 +1305,7 @@ public class CSharpGenerator implements CodeGenerator {
 
         try (Writer out = outputManager.createOutput(encoderName)) {
             final String implementsString = implementsInterface(GEN_COMPOSITE_ENCODER_FLYWEIGHT);
-            generateCompositeFlyweightHeader(token, encoderName, out, mutableBuffer, fqMutableBuffer, implementsString);
+            generateCompositeFlyweightHeader(token, encoderName, out, mutableBuffer, fqMutableBuffer, implementsString, "IEncoderFlyweight");
 
             for (int i = 1, end = tokens.size() - 1; i < end; ) {
                 final Token encodingToken = tokens.get(i);
@@ -2034,7 +2036,7 @@ public class CSharpGenerator implements CodeGenerator {
 
     private CharSequence generateDecoderFlyweightCode(final String className, final Token token) {
         final String wrapMethod = String.format(
-                "    public %1$s Wrap(\n" +
+                "    public IMessageDecoderFlyweight Wrap(\n" +
                         "        %2$s buffer, int offset, int actingBlockLength, int actingVersion)\n" +
                         "    {\n" +
                         "        this._buffer = buffer;\n" +
@@ -2082,19 +2084,19 @@ public class CSharpGenerator implements CodeGenerator {
                         "    {\n" +
                         "        _parentMessage = this;\n" +
                         "    }\n\n" +
-                        "    public %1$s SbeBlockLength()\n" +
+                        "    public int SbeBlockLength()\n" +
                         "    {\n" +
                         "        return BLOCK_LENGTH;\n" +
                         "    }\n\n" +
-                        "    public %3$s SbeTemplateId()\n" +
+                        "    public int SbeTemplateId()\n" +
                         "    {\n" +
                         "        return TEMPLATE_ID;\n" +
                         "    }\n\n" +
-                        "    public %5$s SbeSchemaId()\n" +
+                        "    public int SbeSchemaId()\n" +
                         "    {\n" +
                         "        return SCHEMA_ID;\n" +
                         "    }\n\n" +
-                        "    public %7$s SbeSchemaVersion()\n" +
+                        "    public int SbeSchemaVersion()\n" +
                         "    {\n" +
                         "        return SCHEMA_VERSION;\n" +
                         "    }\n\n" +
@@ -2155,7 +2157,8 @@ public class CSharpGenerator implements CodeGenerator {
                         "        %2$s buffer, int offset, %3$s headerEncoder)\n" +
                         "    {\n" +
                         "        headerEncoder\n" +
-                        "            .Wrap(buffer, offset)\n" +
+                        "            .Wrap(buffer, offset);\n" +
+                        "        headerEncoder\n" +
                         "            .BlockLength(BLOCK_LENGTH)\n" +
                         "            .TemplateId(TEMPLATE_ID)\n" +
                         "            .SchemaId(SCHEMA_ID)\n" +
