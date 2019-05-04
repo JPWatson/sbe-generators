@@ -12,6 +12,5 @@ repositories {
 }
 
 dependencies {
-    compile group: 'uk.co.real-logic', name: 'sbe-tool', version: '1.12.3'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'uk.co.real-logic:sbe-tool:1.12.3'
 }
