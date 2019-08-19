@@ -2,6 +2,8 @@ plugins {
     id 'java'
 }
 
+defaultTasks 'build'
+
 group 'uk.co.real-logic'
 version '1.0-SNAPSHOT'
 
