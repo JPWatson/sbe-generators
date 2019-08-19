@@ -1368,65 +1368,72 @@ public class CSharpGenerator implements CodeGenerator {
     }
 
     private CharSequence generateChoiceDecoders(final List<Token> tokens) {
-        return concatTokens(
-                tokens,
-                Signal.CHOICE,
-                (token) ->
-                {
-                    final String choiceName = formatPropertyName(token.name());
-                    final Encoding encoding = token.encoding();
-                    final String choiceBitIndex = encoding.constValue().toString();
-                    final String byteOrderStr = byteOrderString(encoding);
-                    final PrimitiveType primitiveType = encoding.primitiveType();
-                    final String argType = bitsetArgType(primitiveType);
+        final StringBuilder sb = new StringBuilder();
 
-                    return String.format(
-                            "\n" +
-                                    "    public bool %1$s()\n" +
-                                    "    {\n" +
-                                    "        return %2$s;\n" +
-                                    "    }\n\n" +
-                                    "    public static bool %1$s(%3$s value)\n" +
-                                    "    {\n" +
-                                    "        return %4$s;\n" +
-                                    "    }\n",
-                            choiceName,
-                            generateChoiceGet(primitiveType, choiceBitIndex, byteOrderStr),
-                            argType,
-                            generateStaticChoiceGet(primitiveType, choiceBitIndex));
-                });
+        for (final Token token : tokens)
+        {
+            if (token.signal() == Signal.CHOICE)
+            {
+                final String choiceName = formatPropertyName(token.name());
+                final Encoding encoding = token.encoding();
+                final String choiceBitIndex = encoding.constValue().toString();
+                final String byteOrderStr = byteOrderString(encoding);
+                final PrimitiveType primitiveType = encoding.primitiveType();
+                final String argType = bitsetArgType(primitiveType);
+
+                sb.append(String.format("\n" +
+                                "    public bool %1$s()\n" +
+                                "    {\n" +
+                                "        return %2$s;\n" +
+                                "    }\n\n" +
+                                "    public static bool %1$s(%3$s value)\n" +
+                                "    {\n" +
+                                "        return %4$s;\n" +
+                                "    }\n",
+                        choiceName,
+                        generateChoiceGet(primitiveType, choiceBitIndex, byteOrderStr),
+                        argType,
+                        generateStaticChoiceGet(primitiveType, choiceBitIndex)));
+            }
+        }
+
+        return sb;
     }
 
     private CharSequence generateChoiceEncoders(final String bitSetClassName, final List<Token> tokens) {
-        return concatTokens(
-                tokens,
-                Signal.CHOICE,
-                (token) ->
-                {
-                    final String choiceName = formatPropertyName(token.name());
-                    final Encoding encoding = token.encoding();
-                    final String choiceBitIndex = encoding.constValue().toString();
-                    final String byteOrderStr = byteOrderString(encoding);
-                    final PrimitiveType primitiveType = encoding.primitiveType();
-                    final String argType = bitsetArgType(primitiveType);
+        final StringBuilder sb = new StringBuilder();
 
-                    return String.format(
-                            "\n" +
-                                    "    public %1$s %2$s(bool value)\n" +
-                                    "    {\n" +
-                                    "%3$s\n" +
-                                    "        return this;\n" +
-                                    "    }\n\n" +
-                                    "    public static %4$s %2$s(%4$s bits, bool value)\n" +
-                                    "    {\n" +
-                                    "%5$s" +
-                                    "    }\n",
-                            bitSetClassName,
-                            choiceName,
-                            generateChoicePut(encoding.primitiveType(), choiceBitIndex, byteOrderStr),
-                            argType,
-                            generateStaticChoicePut(encoding.primitiveType(), choiceBitIndex));
-                });
+        for (final Token token : tokens)
+        {
+            if (token.signal() == Signal.CHOICE)
+            {
+                final String choiceName = formatPropertyName(token.name());
+                final Encoding encoding = token.encoding();
+                final String choiceBitIndex = encoding.constValue().toString();
+                final String byteOrderStr = byteOrderString(encoding);
+                final PrimitiveType primitiveType = encoding.primitiveType();
+                final String argType = bitsetArgType(primitiveType);
+
+                sb.append(String.format(
+                        "\n" +
+                                "    public %1$s %2$s(bool value)\n" +
+                                "    {\n" +
+                                "%3$s\n" +
+                                "        return this;\n" +
+                                "    }\n\n" +
+                                "    public static %4$s %2$s(%4$s bits, bool value)\n" +
+                                "    {\n" +
+                                "%5$s" +
+                                "    }\n",
+                        bitSetClassName,
+                        choiceName,
+                        generateChoicePut(encoding.primitiveType(), choiceBitIndex, byteOrderStr),
+                        argType,
+                        generateStaticChoicePut(encoding.primitiveType(), choiceBitIndex)));
+            }
+        }
+
+        return sb;
     }
 
     private String bitsetArgType(final PrimitiveType primitiveType) {

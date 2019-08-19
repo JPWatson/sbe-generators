@@ -14,5 +14,5 @@ repositories {
 }
 
 dependencies {
-    compile 'uk.co.real-logic:sbe-tool:1.12.3'
+    compile 'uk.co.real-logic:sbe-tool:1.13.2'
 }
