@@ -234,10 +234,16 @@ public class CSharpGenerator implements CodeGenerator {
         return values;
     }
 
-    private static CharSequence generateFixedFlyweightCode(
+    private CharSequence generateFixedFlyweightCode(
             final String className, final int size, final String bufferImplementation) {
+
+        final HeaderStructure headerStructure = ir.headerStructure();
+        final String schemaIdType = csharpTypeName(headerStructure.schemaIdType());
+        final String schemaVersionType = csharpTypeName(headerStructure.schemaVersionType());
         return String.format(
-                "    public static int ENCODED_LENGTH = %2$d;\n" +
+                "    public const int ENCODED_LENGTH = %2$d;\n" +
+                "    public const %4$s SCHEMA_ID = %5$s;\n" +
+                "    public const %6$s SCHEMA_VERSION = %7$s;\n\n" +
                         "    private %3$s _buffer;\n" +
                         "    private int _offset;\n\n" +
                         "    public %1$s Wrap(%3$s buffer, int offset)\n" +
@@ -260,13 +266,24 @@ public class CSharpGenerator implements CodeGenerator {
                         "    }\n",
                 className,
                 size,
-                bufferImplementation);
+                bufferImplementation,
+                schemaIdType,
+                generateLiteral(headerStructure.schemaIdType(), Integer.toString(ir.id())),
+                schemaVersionType,
+                generateLiteral(headerStructure.schemaVersionType(), Integer.toString(ir.version()))
+                );
     }
 
-    private static CharSequence generateCompositeFlyweightCode(
+    private CharSequence generateCompositeFlyweightCode(
             final String className, final int size, final String bufferImplementation, final String compositeReturnType) {
+
+        final HeaderStructure headerStructure = ir.headerStructure();
+        final String schemaIdType = csharpTypeName(headerStructure.schemaIdType());
+        final String schemaVersionType = csharpTypeName(headerStructure.schemaVersionType());
         return String.format(
-                "    public static int ENCODED_LENGTH = %2$d;\n" +
+                "    public const int ENCODED_LENGTH = %2$d;\n" +
+                "    public const %5$s SCHEMA_ID = %6$s;\n" +
+                "    public const %7$s SCHEMA_VERSION = %8$s;\n\n" +
                         "    private int _offset;\n" +
                         "    private %3$s _buffer;\n\n" +
                         "    public %4$s Wrap(%3$s buffer, int offset)\n" +
@@ -290,7 +307,11 @@ public class CSharpGenerator implements CodeGenerator {
                 className,
                 size,
                 bufferImplementation,
-                compositeReturnType);
+                compositeReturnType,
+                schemaIdType,
+                generateLiteral(headerStructure.schemaIdType(), Integer.toString(ir.id())),
+                schemaVersionType,
+                generateLiteral(headerStructure.schemaVersionType(), Integer.toString(ir.version())));
     }
 
     private static void generateFieldIdMethod(final StringBuilder sb, final Token token, final String indent) {
