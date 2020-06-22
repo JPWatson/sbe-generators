@@ -2598,7 +2598,7 @@ public class CSharpGenerator implements CodeGenerator {
 
             case UINT32:
                 return
-                        "        return value ? bits | (1 << " + bitIdx + ") : bits & ~(1 << " + bitIdx + ");\n";
+                        "        return (uint)(value ? bits | (1 << " + bitIdx + ") : bits & ~(1 << " + bitIdx + "));\n";
 
             case UINT64:
                 return
