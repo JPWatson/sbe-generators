@@ -2346,7 +2346,7 @@ public class CSharpGenerator implements CodeGenerator {
         }
 
         return String.format(
-                indent + INDENT + INDENT + "if (_actingVersion < %d) return %s.%s.NULL_VALUE;\n\n",
+                indent + INDENT + INDENT + "if (_parentMessage._actingVersion < %d) return %s.%s.NULL_VALUE;\n\n",
                 sinceVersion,
                 namespace,
                 enumName);
