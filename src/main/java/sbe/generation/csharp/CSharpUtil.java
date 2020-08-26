@@ -2,8 +2,8 @@ package sbe.generation.csharp;
 
 import uk.co.real_logic.sbe.PrimitiveType;
 import uk.co.real_logic.sbe.SbeTool;
+import uk.co.real_logic.sbe.ValidationUtil;
 import uk.co.real_logic.sbe.generation.Generators;
-import uk.co.real_logic.sbe.util.ValidationUtil;
 
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;

@@ -2328,7 +2328,7 @@ public class CSharpGenerator implements CodeGenerator {
                             indent + "    }\n\n",
                     enumName,
                     propertyName,
-                    generateEnumFieldNotPresentCondition(token.version(), enumName, indent),
+                    generateEnumFieldNotPresentCondition(token.version(), namespace(), enumName, indent),
                     enumName,
                     generateGet(token.encoding().primitiveType(), "_offset + " + token.offset(), byteOrderStr)
             );
@@ -2337,15 +2337,18 @@ public class CSharpGenerator implements CodeGenerator {
 
     private CharSequence generateEnumFieldNotPresentCondition(
             final int sinceVersion,
+            final String namespace,
             final String enumName,
-            final String indent) {
+            final String indent
+    ) {
         if (0 == sinceVersion) {
             return "";
         }
 
         return String.format(
-                indent + INDENT + INDENT + "if (_actingVersion < %d) return %s.NULL_VALUE;\n\n",
+                indent + INDENT + INDENT + "if (_parentMessage._actingVersion < %d) return %s.%s.NULL_VALUE;\n\n",
                 sinceVersion,
+                namespace,
                 enumName);
     }
 
@@ -2598,7 +2601,7 @@ public class CSharpGenerator implements CodeGenerator {
 
             case UINT32:
                 return
-                        "        return value ? bits | (1 << " + bitIdx + ") : bits & ~(1 << " + bitIdx + ");\n";
+                        "        return (uint)(value ? bits | (1 << " + bitIdx + ") : bits & ~(1 << " + bitIdx + "));\n";
 
             case UINT64:
                 return
